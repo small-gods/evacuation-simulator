@@ -8,7 +8,7 @@ export class World {
     public arrows: Arrow[] = []
 
     public constructor(circleConstructor: (x: number, y: number, r: number) => Phaser.Physics.Arcade.Sprite) {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 25; i++) {
             const { x, y, r } = { x: randomRange(0, 500), y: randomRange(0, 500), r: 0 }
             const sprite = circleConstructor(x, y, r)
             const person = new Person(sprite)
