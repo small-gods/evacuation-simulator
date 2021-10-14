@@ -16,10 +16,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   public create(): void {
+    let group = new Phaser.GameObjects.Group(this);
+
+    this.physics.add.collider(group, group)
+
     this.world = new World((x, y, r) => {
       const sprite = this.physics.add.sprite(x, y, 'man');
       sprite.setMaxVelocity(100)
       sprite.body.bounce.set(1)
+      group.add(sprite)
       sprite.body.setCollideWorldBounds(true);
       return sprite
     })
