@@ -1,40 +1,46 @@
 import { Vector } from "matter";
 import { Arrow } from "./objects";
 import { Person } from "./person";
-import { Direction, directionVector, substract } from "./utils";
+import { Direction, substract, Point } from "./utils";
+
+const cellSize = 50
 
 export class World {
     public actors: Person[] = []
     public arrows: Arrow[] = []
+    public walls: object[] = []
 
-    public constructor(circleConstructor: (x: number, y: number, r: number) => Phaser.Physics.Arcade.Sprite) {
+    public constructor(
+        circleConstructor: (x: number, y: number, r: number) => Phaser.Physics.Arcade.Sprite,
+        wallConstructor: (coords: Point, size: Point) => Phaser.Physics.Arcade.Sprite,
+    ) {
         for (let i = 0; i < 25; i++) {
             const { x, y, r } = { x: randomRange(0, 500), y: randomRange(0, 500), r: 0 }
             const sprite = circleConstructor(x, y, r)
             const person = new Person(sprite)
             this.actors.push(person)
         }
-        this.arrows = [
-            new Arrow(200, 150, 'Right'),
-            new Arrow(300, 150, 'Right'),
-            new Arrow(400, 150, 'Right'),
-            new Arrow(500, 150, 'Right'),
 
-            new Arrow(600, 200, 'Down'),
-            new Arrow(600, 300, 'Down'),
-            new Arrow(600, 400, 'Down'),
-            new Arrow(600, 500, 'Down'),
+        wallConstructor({ x: 300, y: 200 }, { x: 10, y: 200 })
+        wallConstructor({ x: 600, y: 500 }, { x: 10, y: 200 })
+        wallConstructor({ x: 500, y: 600 }, { x: 200, y: 10 })
 
-            new Arrow(200, 600, 'Left'),
-            new Arrow(300, 600, 'Left'),
-            new Arrow(400, 600, 'Left'),
-            new Arrow(500, 600, 'Left'),
+        const width = 4
+        const height = 4
 
-            new Arrow(150, 200, 'Up'),
-            new Arrow(150, 300, 'Up'),
-            new Arrow(150, 400, 'Up'),
-            new Arrow(150, 500, 'Up'),
-        ]
+        for (let i = 0; i < width; i++) {
+            this.addArrow(3 + 2 * i, 2, 'Right')
+            this.addArrow(3 + 2 * i, 2 + 2 * height, 'Left')
+        }
+
+        for (let i = 0; i < height; i++) {
+            this.addArrow(2 + 2 * width, 3 + 2 * i, 'Down')
+            this.addArrow(2, 3 + 2 * i, 'Up')
+        }
+    }
+
+    public addArrow(cellX: number, cellY: number, direction: Direction) {
+        this.arrows.push(new Arrow(cellX * cellSize, cellY * cellSize, direction))
     }
 
     public tick() {
