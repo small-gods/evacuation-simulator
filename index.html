@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>Sample Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
@@ -10,20 +10,65 @@
     <meta http-equiv="cleartype" content="on">
 
     <style>
-        html,
-        body,
-        canvas {
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-        }
+      html,
+      body,
+      canvas {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+      
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      #content {
+        width: 700px;
+        height: 700px;
+      }
+      
+      .counter {
+        padding: 14px;
+        font-size: large;
+        font-weight: 900;
+        color: red;
+      }
+      
+      .counter {
+        padding: 14px;
+        font-size: large;
+        font-weight: 900;
+        color: green;
+      }
+      
+      .burned {
+        color: red;
+      }
+      
+      .burned::before {
+        content: "Burned: ";
+      }
+      
+      .escaped {
+        color: green;
+      }
+      
+      .escaped::before {
+        content: "Escaped: ";
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="content"></div>
+    <div>
+      <div id="burned-counter" class="burned counter">0</div>
+      <div id="escaped-counter" class="escaped counter">0</div>
+    </div>
     <script src="vendors.app.bundle.js"></script>
     <script src="app.bundle.js"></script>
-</body>
+  </body>
 
 </html>
