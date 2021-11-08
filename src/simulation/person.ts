@@ -3,7 +3,7 @@ import { substract, Vector, length } from "./utils"
 
 export class Person {
     public sprite: Phaser.Physics.Arcade.Sprite
-    public vision = 100
+    public vision = 200
     public speed = 100
 
     public constructor(sprite: Phaser.Physics.Arcade.Sprite) {

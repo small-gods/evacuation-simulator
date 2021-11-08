@@ -62,10 +62,27 @@
   </head>
 
   <body>
+    <div>
+      <button class="level-button" data-object="kill-all"><img src="./assets/sprites/kill-all.png"/></button><br>
+      <button class="level-button" data-object="spawn-all"><img src="./assets/sprites/spawn-all.png"/></button><br>
+      <button class="level-button" data-object="arrow-right"><img src="./assets/sprites/arrow-right.png"/></button><br>
+      <button class="level-button" data-object="arrow-left"><img src="./assets/sprites/arrow-left.png"/></button><br>
+      <button class="level-button" data-object="arrow-up"><img src="./assets/sprites/arrow-up.png"/></button><br>
+      <button class="level-button" data-object="arrow-down"><img src="./assets/sprites/arrow-down.png"/></button><br>
+      <button class="level-button" data-object="exit"><img src="./assets/sprites/exit.png"/></button><br>
+      <button class="level-button" data-object="wall"><img src="./assets/sprites/wall.png"/></button><br>
+      <button class="level-button" data-object="fire"><img src="./assets/sprites/fire.png"/></button><br>
+      <button class="level-button" data-object="delete"><img src="./assets/sprites/delete.png"/></button><br>
+    </div>
     <div id="content"></div>
     <div>
       <div id="burned-counter" class="burned counter">0</div>
       <div id="escaped-counter" class="escaped counter">0</div>
+    </div>
+    <div>
+      <textarea id="worldjson">{}</textarea><br>
+      <button id="worldjson-save">Save</button><br>
+      <button id="worldjson-load">Load</button><br>
     </div>
     <script src="vendors.app.bundle.js"></script>
     <script src="app.bundle.js"></script>

@@ -1,4 +1,5 @@
-import { World } from '../simulation/world';
+import { Vector } from '../simulation/utils';
+import { World, WorldJson } from '../simulation/world';
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -28,8 +29,65 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(peopleGroup, peopleGroup)
     this.physics.add.collider(peopleGroup, wallsGroup)
 
-    this.world = new World(
+    const buttonEvents = {
+      "arrow-right": (p: Vector) => {
+        this.world.addArrow(this.world.absoluteToCell(p), 'Right')
+      },
+      "arrow-left": (p: Vector) => {
+        this.world.addArrow(this.world.absoluteToCell(p), 'Left')
+      },
+      "arrow-up": (p: Vector) => {
+        this.world.addArrow(this.world.absoluteToCell(p), 'Up')
+      },
+      "arrow-down": (p: Vector) => {
+        this.world.addArrow(this.world.absoluteToCell(p), 'Down')
+      },
+      "exit": (p: Vector) => {
+        this.world.addExit(this.world.absoluteToCell(p))
+      },
+      "wall": (p: Vector) => {
+        this.world.addWall(p)
+      },
+      "fire": (p: Vector) => {
+        this.world.addFire(this.world.absoluteToCell(p))
+      },
+      "delete": (p: Vector) => {
+        this.world.delete(p)
+      },
+    }
+
+    const buttons = document.querySelectorAll(".level-button")
+    let onButtonAction = (p: Vector) => { }
+    buttons.forEach(button => {
+      const type = button.getAttribute("data-object")
+      if (type === 'kill-all') {
+        button.addEventListener('click', () => {
+          this.world.killAll()
+        })
+      } else if (type === 'spawn-all') {
+        button.addEventListener('click', () => {
+          this.world.spawnAll()
+        })
+      } else if (!(type in buttonEvents)) {
+        return
+      }
+      const callback = buttonEvents[type]
+      button.addEventListener('click', () => {
+        onButtonAction = callback
+      })
+    })
+
+    const content = document.querySelector("#content")
+    content.addEventListener('click', (e: MouseEvent) => {
+      const rect = content.getBoundingClientRect()
+      onButtonAction({ x: e.x - rect.x, y: e.y - rect.y })
+    })
+
+    const worldCreator = (json: WorldJson) => new World(
       { x: 13, y: 13 },
+      (coords, direction) => {
+        return this.physics.add.sprite(coords.x, coords.y, 'arrow-' + direction.toLowerCase())
+      },
       (x, y, r) => {
         const sprite = this.physics.add.sprite(x, y, 'man');
         sprite.setMaxVelocity(100)
@@ -68,10 +126,17 @@ export class GameScene extends Phaser.Scene {
         return sprite
       })
 
-    for (const arrow of this.world.arrows) {
-      this.physics.add.sprite(arrow.x, arrow.y, 'arrow-' + arrow.direction.toLowerCase())
-    }
+    const loadJsonButton = document.querySelector("#worldjson-load")
+    const saveJsonButton = document.querySelector("#worldjson-save")
+    const worldJsonText = document.querySelector("#worldjson")
+    loadJsonButton.addEventListener('click', () => {
+      worldCreator(JSON.parse(worldJsonText.textContent))
+    })
+    saveJsonButton.addEventListener('click', () => {
+      worldJsonText.textContent = JSON.stringify(this.world.toJson())
+    })
 
+    this.world = worldCreator({})
   }
 
   public update(): void {
