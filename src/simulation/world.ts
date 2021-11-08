@@ -37,7 +37,7 @@ export class World {
         wallConstructor: (coords: Vector, size: Vector) => Phaser.Physics.Arcade.Sprite,
         fireConstructor: (coords: Vector, size: Vector) => Phaser.Physics.Arcade.Sprite,
         escapeConstructor: (coords: Vector, size: Vector) => Phaser.Physics.Arcade.Sprite,
-        json: WorldJson = {},
+        json: WorldJson,
     ) {
         this.bounds = bounds
         this.fireConstructor = fireConstructor
@@ -62,7 +62,7 @@ export class World {
             for (const actor of json.wallLefts)
                 this.addWallLoc({ x: actor.x, y: actor.y }, 'Left')
         if (json.wallTops)
-            for (const actor of json.actors)
+            for (const actor of json.wallTops)
                 this.addWallLoc({ x: actor.x, y: actor.y }, 'Top')
         // const width = 4
         // const height = 4
@@ -103,6 +103,27 @@ export class World {
         this.arrows = this.filterGameObjects(cell, this.arrows)
         this.exits = this.filterGameObjects(cell, this.exits)
         this.deleteWall(coordinates)
+    }
+
+    public deleteAll() {
+        for (const actor of this.actors)
+            actor.sprite.destroy()
+        this.actors = []
+        for (const actor of this.arrows)
+            actor.sprite.destroy()
+        this.arrows = []
+        for (const actor of this.fires)
+            actor.sprite.destroy()
+        this.fires = []
+        for (const actor of this.exits)
+            actor.sprite.destroy()
+        this.exits = []
+        for (const actor of this.wallLefts)
+            actor.sprite.destroy()
+        this.wallLefts = []
+        for (const actor of this.wallTops)
+            actor.sprite.destroy()
+        this.wallTops = []
     }
 
     public spawnAll() {

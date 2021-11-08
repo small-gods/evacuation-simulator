@@ -129,16 +129,18 @@ export class GameScene extends Phaser.Scene {
           escapedCounter.textContent = this.escaped + ""
         })
         return sprite
-      })
+      }, json)
 
     const loadJsonButton = document.querySelector("#worldjson-load")
     const saveJsonButton = document.querySelector("#worldjson-save")
-    const worldJsonText = document.querySelector("#worldjson")
+    const worldJsonText = document.querySelector("#worldjson") as HTMLInputElement
     loadJsonButton.addEventListener('click', () => {
-      worldCreator(JSON.parse(worldJsonText.textContent))
+      console.log(JSON.parse(worldJsonText.value))
+      this.world.deleteAll()
+      this.world = worldCreator(JSON.parse(worldJsonText.value))
     })
     saveJsonButton.addEventListener('click', () => {
-      worldJsonText.textContent = JSON.stringify(this.world.toJson())
+      worldJsonText.value = JSON.stringify(this.world.toJson())
     })
 
     this.world = worldCreator({})
