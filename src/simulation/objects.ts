@@ -48,4 +48,16 @@ export class Wall extends GameObject {
         super(x, y, sprite)
         this.location = location
     }
+
+    public line(cellSize: number): {a: Vector, b: Vector} {
+      if (this.location === 'Top') {
+          const left = this.sprite.getLeftCenter()
+          const right = this.sprite.getRightCenter()
+          return {a: {x: left.x, y: this.sprite.y}, b: {x: right.x, y: this.sprite.y}}
+      } else {
+        const top = this.sprite.getTopCenter()
+        const bottom = this.sprite.getBottomCenter()
+        return {a: {x: this.sprite.x, y: top.y}, b: {x: this.sprite.x, y: bottom.y}}
+      }
+    }
 }

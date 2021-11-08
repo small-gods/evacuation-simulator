@@ -30,6 +30,9 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(peopleGroup, wallsGroup)
 
     const buttonEvents = {
+      "actor": (p: Vector) => {
+        this.world.spawn(p.x, p.y)
+      },
       "arrow-right": (p: Vector) => {
         this.world.addArrow(this.world.absoluteToCell(p), 'Right')
       },
@@ -64,10 +67,12 @@ export class GameScene extends Phaser.Scene {
         button.addEventListener('click', () => {
           this.world.killAll()
         })
+        return
       } else if (type === 'spawn-all') {
         button.addEventListener('click', () => {
           this.world.spawnAll()
         })
+        return
       } else if (!(type in buttonEvents)) {
         return
       }

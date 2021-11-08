@@ -1,6 +1,6 @@
 import { Arrow, Fire, GameObject, Wall, WallLocation } from "./objects";
 import { Person } from "./person";
-import { Direction, substract, distance, randomRange, length, Vector, directionVector } from "./utils";
+import { Direction, substract, distance, randomRange, length, Vector, directionVector, collide, mul } from "./utils";
 
 const cellSize = 50
 
@@ -235,37 +235,55 @@ export class World {
             this.addFire(growth)
         }
         for (let actor of this.actors) {
-            const exitDistances = this.exits.map(arrow => (distance({ x: actor.x, y: actor.y }, { x: arrow.x * cellSize, y: arrow.y * cellSize })))
-            let minExitDistance = exitDistances[0];
-            let exit = this.exits[0]
+            const exitDistances = this.exits.map(arrow => (distance({ x: actor.x, y: actor.y }, mul(arrow, cellSize))))
+
+            let minExitDistance = Infinity;
+            let exit = null
             for (let i in exitDistances) {
+                if (this.collidesWithWall(this.exits[i].coordinates, actor.coordinates)) {
+                    console.log('collides')
+                    continue
+                }
                 if (minExitDistance > exitDistances[i]) {
                     minExitDistance = exitDistances[i]
                     exit = this.exits[i]
                 }
             }
 
-            if (minExitDistance < actor.vision) {
-                actor.accelerate(exit)
+            if (exit && minExitDistance < actor.vision) {
+                actor.accelerate(mul(exit, cellSize))
                 continue
             }
 
-            const arrowDistances = this.arrows.map(arrow => (distance({ x: actor.x, y: actor.y }, { x: arrow.x * cellSize, y: arrow.y * cellSize })))
-            let minArrowDistance = arrowDistances[0];
-            let arrow = this.arrows[0]
+            const arrowDistances = this.arrows.map(arrow => (distance({ x: actor.x, y: actor.y }, mul(arrow, cellSize))))
+            let minArrowDistance = Infinity;
+            let arrow = null
             for (let i in arrowDistances) {
+                if (this.collidesWithWall(this.arrows[i].coordinates, actor.coordinates))
+                    continue
                 if (minArrowDistance > arrowDistances[i]) {
                     minArrowDistance = arrowDistances[i]
                     arrow = this.arrows[i]
                 }
             }
 
-            if (minArrowDistance > actor.vision) {
-                actor.sprite.setAcceleration(randomRange(-actor.speed, actor.speed), randomRange(-actor.speed, actor.speed))
+            if (arrow && minArrowDistance < actor.vision) {
+                actor.accelerate(mul(arrow.coordinates, cellSize), arrow.directionVector)
                 continue
             }
-            actor.accelerate(arrow.coordinates, arrow.directionVector)
+
+            actor.sprite.setAcceleration(randomRange(-actor.speed, actor.speed), randomRange(-actor.speed, actor.speed))
         }
+    }
+
+    public collidesWithWall(a: Vector, b: Vector): boolean {
+        return this.wallTops.some(wall => {
+            let wallLine = wall.line(cellSize)
+            return collide(a, b, wallLine.a, wallLine.b)
+        }) || this.wallLefts.some(wall => {
+            let wallLine = wall.line(cellSize)
+            return collide(a, b, wallLine.a, wallLine.b)
+        })
     }
 
     public inBounds(vector: Vector): boolean {
