@@ -46,6 +46,9 @@ export class Fire extends GameObject {
         if (!world.hasWallLoc({ ...fireCell, x: fireCell.x + 1 }, 'Left'))
             possibleDirections.push('Right')
 
+        if (possibleDirections.length === 0)
+            return
+
         const dirVector = directionVector(randomElement(possibleDirections))
         const growth = { x: this.x + dirVector.x, y: this.y + dirVector.y }
         if (!world.inBounds(growth) || world.fires.some(v => v.x === growth.x && v.y === growth.y))
