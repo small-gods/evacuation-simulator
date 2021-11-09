@@ -1,4 +1,4 @@
-import { BootScene } from './boot-scene';
-import { GameScene } from './game-scene';
+import { BootScene } from './boot-scene'
+import { GameScene } from './game-scene'
 
-export default [BootScene, GameScene];
+export default [BootScene, GameScene]

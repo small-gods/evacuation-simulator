@@ -12,7 +12,8 @@
         "build:prod": "webpack --env.production",
         "dev": "webpack-dev-server",
         "prod": "webpack-dev-server --env.production",
-        "lint": "eslint src"
+        "lint": "eslint src",
+        "format": "eslint src --fix"
     },
     "dependencies": {
         "phaser": "^3.50.0"

@@ -1,14 +1,17 @@
 export type Direction = 'Up' | 'Down' | 'Left' | 'Right'
 
-export type Vector = { x: number, y: number, type?: 'Vector' }
+export type Vector = { x: number; y: number; type?: 'Vector' }
 
-export type Cell = { x: number, y: number, type?: 'Cell' }
+export type Cell = { x: number; y: number; type?: 'Cell' }
 
 export function directionVector(direction: Direction): Vector {
-    return direction === 'Up' ? { x: 0, y: -1 }
-        : direction === 'Down' ? { x: 0, y: 1 }
-            : direction === 'Left' ? { x: -1, y: 0 }
-                : { x: 1, y: 0 }
+    return direction === 'Up'
+        ? { x: 0, y: -1 }
+        : direction === 'Down'
+        ? { x: 0, y: 1 }
+        : direction === 'Left'
+        ? { x: -1, y: 0 }
+        : { x: 1, y: 0 }
 }
 
 export function substract(a: Vector, b: Vector): Vector {
@@ -54,11 +57,11 @@ export function collide(a1: Vector, b1: Vector, a2: Vector, b2: Vector): boolean
     const y2 = b1.y
     const y3 = a2.y
     const y4 = b2.y
-    const a_dx = x2 - x1;
-    const a_dy = y2 - y1;
-    const b_dx = x4 - x3;
-    const b_dy = y4 - y3;
-    const s = (-a_dy * (x1 - x3) + a_dx * (y1 - y3)) / (-b_dx * a_dy + a_dx * b_dy);
-    const t = (+b_dx * (y1 - y3) - b_dy * (x1 - x3)) / (-b_dx * a_dy + a_dx * b_dy);
-    return (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+    const a_dx = x2 - x1
+    const a_dy = y2 - y1
+    const b_dx = x4 - x3
+    const b_dy = y4 - y3
+    const s = (-a_dy * (x1 - x3) + a_dx * (y1 - y3)) / (-b_dx * a_dy + a_dx * b_dy)
+    const t = (+b_dx * (y1 - y3) - b_dy * (x1 - x3)) / (-b_dx * a_dy + a_dx * b_dy)
+    return s >= 0 && s <= 1 && t >= 0 && t <= 1
 }
