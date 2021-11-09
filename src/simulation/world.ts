@@ -1,27 +1,26 @@
+import { AxesFactory } from "matter";
 import { Arrow, Fire, GameObject, Wall, WallLocation } from "./objects";
 import { Person } from "./person";
-import { Direction, substract, distance, randomRange, length, Vector, directionVector, collide, mul } from "./utils";
+import { Direction, substract, distance, randomRange, length, Vector, directionVector, collide, mul, Cell } from "./utils";
 
 const cellSize = 50
 
 export type WorldJson = {
     actors?: Vector[],
-    arrows?: { vec: Vector, dir: Direction }[],
-    fires?: Vector[],
-    exits?: Vector[],
-    wallTops?: Vector[],
-    wallLefts?: Vector[],
+    arrows?: { vec: Cell, dir: Direction }[],
+    fires?: Cell[],
+    exits?: Cell[],
+    wallTops?: Cell[],
+    wallLefts?: Cell[],
 }
 
 export class World {
-    private actors: Person[] = []
+    public actors: Person[] = []
     public arrows: Arrow[] = []
-    private fires: Fire[] = []
-    private exits: GameObject[] = []
-    private wallTops: Wall[] = []
-    private wallLefts: Wall[] = []
-
-    public cells: Map<Vector, Fire> = new Map()
+    public fires: Fire[] = []
+    public exits: GameObject[] = []
+    public wallTops: Wall[] = []
+    public wallLefts: Wall[] = []
 
     private fireConstructor: (coords: Vector, size: Vector) => Phaser.Physics.Arcade.Sprite
     private escapeConstructor: (coords: Vector, size: Vector) => Phaser.Physics.Arcade.Sprite
@@ -83,17 +82,23 @@ export class World {
     public toJson(): WorldJson {
         return {
             actors: this.actors.map(actor => actor.coordinates),
-            arrows: this.arrows.map(arrow => ({ vec: arrow.coordinates, dir: arrow.direction })),
-            fires: this.fires.map(actor => actor.coordinates),
-            exits: this.exits.map(actor => actor.coordinates),
-            wallLefts: this.wallLefts.map(actor => actor.coordinates),
-            wallTops: this.wallTops.map(actor => actor.coordinates),
+            arrows: this.arrows.map(arrow => ({ vec: arrow.cell, dir: arrow.direction })),
+            fires: this.fires.map(actor => actor.cell),
+            exits: this.exits.map(actor => actor.cell),
+            wallLefts: this.wallLefts.map(actor => actor.cell),
+            wallTops: this.wallTops.map(actor => actor.cell),
         }
     }
 
-    public absoluteToCell(v: Vector): Vector {
+    public absoluteToCell(v: Vector): Cell {
         return {
             x: Math.round(v.x / cellSize), y: Math.round(v.y / cellSize)
+        }
+    }
+
+    public cellToVector(v: Cell): Vector {
+        return {
+            x: Math.round(v.x * cellSize), y: Math.round(v.y * cellSize)
         }
     }
 
@@ -144,7 +149,7 @@ export class World {
         this.actors = []
     }
 
-    private filterGameObjects<O extends GameObject>(cell: Vector, array: O[]): O[] {
+    private filterGameObjects<O extends GameObject>(cell: Cell, array: O[]): O[] {
         const toDelete = array.filter(v => (v.x === cell.x && v.y === cell.y))
         toDelete.forEach(object => {
             object.sprite.destroy()
@@ -168,7 +173,7 @@ export class World {
         this.addWallLoc(cell, loc)
     }
 
-    private hasWallLoc(cell: Vector, loc: WallLocation) {
+    public hasWallLoc(cell: Cell, loc: WallLocation) {
         if (loc === 'Top') {
             return this.wallTops.some(v => (v.x === cell.x && v.y === cell.y))
         } else {
@@ -176,13 +181,13 @@ export class World {
         }
     }
 
-    private addWallLoc(cell: Vector, loc: WallLocation) {
+    private addWallLoc(cell: Cell, loc: WallLocation) {
         if (loc === 'Top') {
             const sprite = this.wallConstructor({ x: cell.x * cellSize, y: cell.y * cellSize - cellSize / 2 }, { x: cellSize + 10, y: 10 })
-            this.wallTops.push(new Wall(cell.x, cell.y, 'Top', sprite))
+            this.wallTops.push(new Wall(cell, 'Top', sprite))
         } else {
             const sprite = this.wallConstructor({ x: cell.x * cellSize - cellSize / 2, y: cell.y * cellSize }, { x: 10, y: cellSize + 10 })
-            this.wallLefts.push(new Wall(cell.x, cell.y, 'Left', sprite))
+            this.wallLefts.push(new Wall(cell, 'Left', sprite))
         }
     }
 
@@ -195,7 +200,7 @@ export class World {
         }
     }
 
-    private getWallCell(coordinates: Vector): { cell: Vector, loc: WallLocation } {
+    private getWallCell(coordinates: Vector): { cell: Cell, loc: WallLocation } {
         const inCellX = (coordinates.x - cellSize / 2) % cellSize
         const inCellY = (coordinates.y - cellSize / 2) % cellSize
         const cell = this.absoluteToCell(coordinates)
@@ -214,86 +219,32 @@ export class World {
         }
     }
 
-    public addArrow(cell: Vector, direction: Direction) {
+    public addArrow(cell: Cell, direction: Direction) {
         if (this.arrows.some(v => (v.x === cell.x && v.y === cell.y)))
             return;
 
         const sprite = this.arrowConstructor({ x: cell.x * cellSize, y: cell.y * cellSize }, direction)
-        const arrow = new Arrow(cell.x, cell.y, direction, sprite)
+        const arrow = new Arrow(cell, direction, sprite)
         this.arrows.push(arrow)
     }
 
-    public addFire(cell: Vector) {
+    public addFire(cell: Cell) {
         const sprite = this.fireConstructor({ x: cell.x * cellSize, y: cell.y * cellSize }, { x: cellSize, y: cellSize })
-        const fire = new Fire(cell.x, cell.y, sprite)
+        const fire = new Fire(cell, sprite)
         this.fires.push(fire)
-        this.cells.set(cell, fire)
     }
 
-    public addExit(cell: Vector) {
+    public addExit(cell: Cell) {
         const sprite = this.escapeConstructor({ x: cell.x * cellSize, y: cell.y * cellSize }, { x: cellSize, y: cellSize })
-        this.exits.push(new GameObject(cell.x, cell.y, sprite))
+        this.exits.push(new GameObject(cell, sprite))
     }
 
     public tick() {
         for (const fire of this.fires) {
-            const fireCell = fire.coordinates
-            const growthDir = fire.grow(this.fires.length)
-            if (growthDir === 'null')
-                continue
-            const dirVector = directionVector(growthDir)
-            const growth = { x: fire.x + dirVector.x, y: fire.y + dirVector.y }
-            if (growthDir === 'Up' && this.hasWallLoc(fireCell, 'Top'))
-                continue
-            if (growthDir === 'Down' && this.hasWallLoc({ ...fireCell, y: fireCell.y + 1 }, 'Top'))
-                continue
-            if (growthDir === 'Left' && this.hasWallLoc(fireCell, 'Left'))
-                continue
-            if (growthDir === 'Right' && this.hasWallLoc({ ...fireCell, x: fireCell.x + 1 }, 'Left'))
-                continue
-            if (!this.inBounds(growth) || this.cells.get(growth) !== undefined)
-                continue
-            this.addFire(growth)
+            fire.tick(this)
         }
         for (let actor of this.actors) {
-            const exitDistances = this.exits.map(arrow => (distance({ x: actor.x, y: actor.y }, mul(arrow, cellSize))))
-
-            let minExitDistance = Infinity;
-            let exit = null
-            for (let i in exitDistances) {
-                if (this.collidesWithWall(mul(this.exits[i].coordinates, cellSize), actor.coordinates)) {
-                    console.log('collides')
-                    continue
-                }
-                if (minExitDistance > exitDistances[i]) {
-                    minExitDistance = exitDistances[i]
-                    exit = this.exits[i]
-                }
-            }
-
-            if (exit && minExitDistance < actor.vision) {
-                actor.accelerate(mul(exit, cellSize))
-                continue
-            }
-
-            const arrowDistances = this.arrows.map(arrow => (distance({ x: actor.x, y: actor.y }, mul(arrow, cellSize))))
-            let minArrowDistance = Infinity;
-            let arrow = null
-            for (let i in arrowDistances) {
-                if (this.collidesWithWall(mul(this.arrows[i].coordinates, cellSize), actor.coordinates))
-                    continue
-                if (minArrowDistance > arrowDistances[i]) {
-                    minArrowDistance = arrowDistances[i]
-                    arrow = this.arrows[i]
-                }
-            }
-
-            if (arrow && minArrowDistance < actor.vision) {
-                actor.accelerate(mul(arrow.coordinates, cellSize), arrow.directionVector)
-                continue
-            }
-
-            actor.sprite.setAcceleration(randomRange(-actor.speed, actor.speed), randomRange(-actor.speed, actor.speed))
+            actor.tick(this)
         }
     }
 
@@ -308,6 +259,6 @@ export class World {
     }
 
     public inBounds(vector: Vector): boolean {
-        return this.bounds.x >= vector.x && this.bounds.y >= vector.y && vector.y >= 0 && vector.x >= 0
+        return this.bounds.x >= vector.x && this.bounds.y >= vector.y && vector.y > 0 && vector.x > 0
     }
 }

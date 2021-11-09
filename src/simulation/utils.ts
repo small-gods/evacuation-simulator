@@ -1,6 +1,8 @@
 export type Direction = 'Up' | 'Down' | 'Left' | 'Right'
 
-export type Vector = { x: number, y: number }
+export type Vector = { x: number, y: number, type?: 'Vector' }
+
+export type Cell = { x: number, y: number, type?: 'Cell' }
 
 export function directionVector(direction: Direction): Vector {
     return direction === 'Up' ? { x: 0, y: -1 }
@@ -33,10 +35,14 @@ export function randomInteger(from, to: number): number {
     return Math.floor(randomRange(from, to))
 }
 
+export function randomElement<T>(array: T[]): T {
+    return array[randomInteger(0, array.length)]
+}
+
 const directions = ['Up' as Direction, 'Down' as Direction, 'Left' as Direction, 'Right' as Direction]
 
 export function randomDirection(): Direction {
-    return directions[randomInteger(0, 4)]
+    return randomElement(directions)
 }
 
 export function collide(a1: Vector, b1: Vector, a2: Vector, b2: Vector): boolean {
