@@ -84,10 +84,10 @@ export class World {
         return {
             actors: this.actors.map(actor => actor.coordinates),
             arrows: this.arrows.map(arrow => ({ vec: arrow.coordinates, dir: arrow.direction })),
-            fires: this.actors.map(actor => actor.coordinates),
-            exits: this.actors.map(actor => actor.coordinates),
-            wallLefts: this.actors.map(actor => actor.coordinates),
-            wallTops: this.actors.map(actor => actor.coordinates),
+            fires: this.fires.map(actor => actor.coordinates),
+            exits: this.exits.map(actor => actor.coordinates),
+            wallLefts: this.wallLefts.map(actor => actor.coordinates),
+            wallTops: this.wallTops.map(actor => actor.coordinates),
         }
     }
 
@@ -261,7 +261,7 @@ export class World {
             let minExitDistance = Infinity;
             let exit = null
             for (let i in exitDistances) {
-                if (this.collidesWithWall(this.exits[i].coordinates, actor.coordinates)) {
+                if (this.collidesWithWall(mul(this.exits[i].coordinates, cellSize), actor.coordinates)) {
                     console.log('collides')
                     continue
                 }
@@ -280,7 +280,7 @@ export class World {
             let minArrowDistance = Infinity;
             let arrow = null
             for (let i in arrowDistances) {
-                if (this.collidesWithWall(this.arrows[i].coordinates, actor.coordinates))
+                if (this.collidesWithWall(mul(this.arrows[i].coordinates, cellSize), actor.coordinates))
                     continue
                 if (minArrowDistance > arrowDistances[i]) {
                     minArrowDistance = arrowDistances[i]
