@@ -14,12 +14,16 @@
 
 <body>
     <div class="action-buttons">
-        <div class="action-button" data-object="spawn-all"><img class="action-button__image" src="./assets/sprites/spawn-all.png" /></div><br>
         <div class="action-button" data-object="kill-all"><img class="action-button__image" src="./assets/sprites/kill-all.png" /></div><br>
+        <div class="action-button" data-object="spawn-all"><img class="action-button__image" src="./assets/sprites/spawn-all.png" /></div><br>
+        <div class="action-button" data-object="actor"><img class="action-button__image" src="./assets/sprites/character.png" /></div><br>
         <div class="action-button" data-object="arrow-right"><img class="action-button__image" src="./assets/sprites/arrow-right.png" /></div><br>
         <div class="action-button" data-object="arrow-left"><img class="action-button__image" src="./assets/sprites/arrow-left.png" /></div><br>
         <div class="action-button" data-object="arrow-up"><img class="action-button__image" src="./assets/sprites/arrow-up.png" /></div><br>
         <div class="action-button" data-object="arrow-down"><img class="action-button__image" src="./assets/sprites/arrow-down.png" /></div><br>
+        <div class="action-button" data-object="exit"><img class="action-button__image" src="./assets/sprites/exit.png" /></div><br>
+        <div class="action-button" data-object="wall"><img class="action-button__image" src="./assets/sprites/wall.png" /></div><br>
+        <div class="action-button" data-object="fire"><img class="action-button__image" src="./assets/sprites/fire.png" /></div><br>
         <div class="action-button" data-object="delete"><img class="action-button__image" src="./assets/sprites/delete.png" /></div><br>
     </div>
     <div id="content" class="content-container"></div>
@@ -27,10 +31,10 @@
         <div id="burned-counter" class="burned counter">0</div>
         <div id="escaped-counter" class="escaped counter">0</div>
     </div>
-    <div class="level-buttons">
-        <div class="level-button" data-object="./assets/levels/level1.json">Level 1</div>
-        <div class="level-button" data-object="./assets/levels/level2.json">Level 2</div>
-        <div class="level-button" data-object="./assets/levels/level3.json">Level 3</div>
+    <div>
+        <textarea id="worldjson">{}</textarea><br>
+        <button id="worldjson-save">Save</button><br>
+        <button id="worldjson-load">Load</button><br>
     </div>
     <script src="vendors.app.bundle.js"></script>
     <script src="app.bundle.js"></script>

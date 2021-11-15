@@ -56,12 +56,9 @@ export default <webpack.ConfigurationFactory>((rawEnv) => {
     plugins: [
       new CopyPlugin({
         patterns: [
-          {
-            from: 'index.html',
-          },
-          {
-            from: 'assets/**/*',
-          },
+          { from: '*.html' },
+          { from: 'assets/**/*'},
+          { from: 'style/**/*'},
         ],
       }),
       new webpack.DefinePlugin({

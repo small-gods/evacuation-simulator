@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser'
 import Scenes from './scenes'
+import { isDesigner } from './helpers'
 
 const content = document.querySelector('#content') as HTMLDivElement
 
@@ -18,12 +19,12 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            debug: isDesigner,
         },
     },
 
     parent: content,
-    backgroundColor: '#000000',
+    backgroundColor: '#f5f5f5',
 }
 
 export const game = new Phaser.Game(gameConfig)

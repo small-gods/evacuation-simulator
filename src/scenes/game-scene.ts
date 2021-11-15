@@ -52,9 +52,9 @@ export class GameScene extends Phaser.Scene {
         const burnedCounter = document.querySelector('#burned-counter') as HTMLDivElement
         const escapedCounter = document.querySelector('#escaped-counter') as HTMLDivElement
 
-        const buttons = document.querySelectorAll('.level-button')
+        const actionButtons = document.querySelectorAll('.action-button')
         let onButtonAction = (p: Vector) => {}
-        buttons.forEach(button => {
+        actionButtons.forEach(button => {
             const type = button.getAttribute('data-object')
             if (type === 'kill-all') {
                 button.addEventListener('click', () => {
@@ -100,13 +100,29 @@ export class GameScene extends Phaser.Scene {
         const loadJsonButton = document.querySelector('#worldjson-load')
         const saveJsonButton = document.querySelector('#worldjson-save')
         const worldJsonText = document.querySelector('#worldjson') as HTMLInputElement
-        loadJsonButton.addEventListener('click', () => {
+        if (loadJsonButton) loadJsonButton.addEventListener('click', () => {
             console.log(JSON.parse(worldJsonText.value))
             this.world.deleteAll()
             this.world = worldCreator(JSON.parse(worldJsonText.value))
         })
-        saveJsonButton.addEventListener('click', () => {
+        if (saveJsonButton) saveJsonButton.addEventListener('click', () => {
             worldJsonText.value = JSON.stringify(this.world.toJson())
+        })
+
+        const levelButtons = document.querySelectorAll('.level-button')
+        levelButtons.forEach(button => {
+            const url = button.getAttribute('data-object')
+            button.addEventListener('click', () => {
+                fetch(url)
+                .then(resp => {
+                    return resp.json();
+                })
+                .then(resp => {
+                    this.world.deleteAll()
+                    this.world = worldCreator(resp)
+                })
+                .catch();
+            })
         })
 
         this.world = worldCreator({})

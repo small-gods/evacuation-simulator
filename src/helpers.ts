@@ -1,9 +1,11 @@
 import * as Phaser from 'phaser'
 
-export const getGameWidth = (scene: Phaser.Scene): number => {
+export function getGameWidth (scene: Phaser.Scene): number {
     return scene.game.scale.width
 }
 
-export const getGameHeight = (scene: Phaser.Scene): number => {
+export function getGameHeight (scene: Phaser.Scene): number{
     return scene.game.scale.height
 }
+
+export const isDesigner = document.URL.includes("designer");
