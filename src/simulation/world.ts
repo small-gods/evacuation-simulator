@@ -1,3 +1,5 @@
+import { json } from 'stream/consumers'
+import { isDesigner } from '../helpers'
 import { BodyFactory } from './body-factory'
 import { Arrow, Fire, GameObject, Wall, WallLocation } from './objects'
 import { Person } from './person'
@@ -24,17 +26,49 @@ export class World {
 
     private bodyFactory: BodyFactory
     private bounds: Vector
+    private worldJson: WorldJson;
+    public runningSimulation = false;
 
     public constructor(bounds: Vector, bodyFactory: BodyFactory, json: WorldJson) {
         this.bounds = bounds
         this.bodyFactory = bodyFactory
+        this.worldJson = json
+        this.reloadWorld(isDesigner, true)
+    }
 
-        if (json.actors) for (const actor of json.actors) this.addActor(actor.x, actor.y)
-        if (json.arrows) for (const actor of json.arrows) this.addArrow(actor.vec, actor.dir)
-        if (json.fires) for (const actor of json.fires) this.addFire({ x: actor.x, y: actor.y })
-        if (json.exits) for (const actor of json.exits) this.addExit({ x: actor.x, y: actor.y })
-        if (json.wallLefts) for (const actor of json.wallLefts) this.addWallLoc({ x: actor.x, y: actor.y }, 'Left')
-        if (json.wallTops) for (const actor of json.wallTops) this.addWallLoc({ x: actor.x, y: actor.y }, 'Top')
+    private reloadWorld(spawnActors: boolean, spawnWorld) {
+        const json = this.worldJson;
+        if (json.actors && spawnActors) for (const actor of json.actors) this.addActor(actor.x, actor.y)
+        if (json.fires && spawnActors) for (const actor of json.fires) this.addFire({ x: actor.x, y: actor.y })
+        if (json.arrows && spawnWorld) for (const actor of json.arrows) this.addArrow(actor.vec, actor.dir)
+        if (json.exits && spawnWorld) for (const actor of json.exits) this.addExit({ x: actor.x, y: actor.y })
+        if (json.wallLefts && spawnWorld) for (const actor of json.wallLefts) this.addWallLoc({ x: actor.x, y: actor.y }, 'Left')
+        if (json.wallTops && spawnWorld) for (const actor of json.wallTops) this.addWallLoc({ x: actor.x, y: actor.y }, 'Top')
+    }
+
+    public runSimulation() {
+        if (this.runningSimulation) return;
+        if (isDesigner) {
+            this.worldJson = this.toJson();
+        } else {
+            this.reloadWorld(true, false);
+        }
+        this.runningSimulation = true;
+    }
+
+    public stopSimulation() {
+        if (!this.runningSimulation) return;
+        if (isDesigner) {
+            this.deleteAll();
+            this.reloadWorld(true, true);
+        } else {
+            this.killAll()
+        }
+        this.runningSimulation = false;
+    }
+
+    public isRunning(): boolean {
+        return this.runningSimulation;
     }
 
     public toJson(): WorldJson {
@@ -51,11 +85,15 @@ export class World {
     // ** Deletion **
 
     public delete(coordinates: Vector) {
+        if (this.runningSimulation) return
+
         const cell = this.absoluteToCell(coordinates)
-        this.fires = filterGameObjects(cell, this.fires)
+        if (isDesigner) {
+            this.fires = filterGameObjects(cell, this.fires)
+            this.exits = filterGameObjects(cell, this.exits)
+            this.deleteWall(coordinates)
+        }
         this.arrows = filterGameObjects(cell, this.arrows)
-        this.exits = filterGameObjects(cell, this.exits)
-        this.deleteWall(coordinates)
     }
 
     public deleteAll() {
@@ -93,7 +131,9 @@ export class World {
 
     public killAll() {
         this.actors.forEach(actor => actor.sprite.destroy())
+        this.fires.forEach(actor => actor.sprite.destroy())
         this.actors = []
+        this.fires = []
     }
 
     public deletePersonBySprite(sprite: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
@@ -209,6 +249,7 @@ export class World {
     }
 
     public tick() {
+        if (!this.isRunning()) return;
         for (const fire of this.fires) {
             fire.tick(this)
         }

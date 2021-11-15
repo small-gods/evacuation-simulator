@@ -58,12 +58,16 @@ export class GameScene extends Phaser.Scene {
             const type = button.getAttribute('data-object')
             if (type === 'kill-all') {
                 button.addEventListener('click', () => {
-                    this.world.killAll()
+                    this.world.stopSimulation()
                 })
                 return
             } else if (type === 'spawn-all') {
                 button.addEventListener('click', () => {
-                    this.world.spawnManyActors()
+                    this.burned = 0;
+                    this.escaped = 0;
+                    burnedCounter.textContent = this.burned + ''
+                    escapedCounter.textContent = this.escaped + ''
+                    this.world.runSimulation()
                 })
                 return
             } else if (!(type in this.buttonEvents)) {
@@ -77,6 +81,7 @@ export class GameScene extends Phaser.Scene {
 
         const content = document.querySelector('#content')
         content.addEventListener('click', (e: MouseEvent) => {
+            if (this.world.isRunning()) return;
             const rect = content.getBoundingClientRect()
             onButtonAction({ x: e.x - rect.x, y: e.y - rect.y })
         })
@@ -98,7 +103,8 @@ export class GameScene extends Phaser.Scene {
             },
         )
 
-        const worldCreator = (json: WorldJson) => new World({ x: 13, y: 13 }, bodyFactory, json)
+        const worldCreator = (json: WorldJson) =>
+            new World({ x: 13, y: 13 }, bodyFactory, json)
 
         const loadJsonButton = document.querySelector('#worldjson-load')
         const saveJsonButton = document.querySelector('#worldjson-save')

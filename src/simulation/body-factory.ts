@@ -32,7 +32,7 @@ export class BodyFactory {
     public actor(x: number, y: number, r: number): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'man')
         sprite.play({ key: 'run', repeat: -1, startFrame: (Math.random() * 10) | 0, frameRate: 4 })
-        sprite.setMaxVelocity(100)
+        sprite.setMaxVelocity(50)
         sprite.body.bounce.set(1)
         sprite.body.setCollideWorldBounds(true)
 
