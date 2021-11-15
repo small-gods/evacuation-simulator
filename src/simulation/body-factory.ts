@@ -31,6 +31,7 @@ export class BodyFactory {
     }
     public actor(x: number, y: number, r: number): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'man')
+        sprite.play({ key: 'run', repeat: -1, startFrame: (Math.random() * 10) | 0, frameRate: 4 })
         sprite.setMaxVelocity(100)
         sprite.body.bounce.set(1)
         sprite.body.setCollideWorldBounds(true)
@@ -48,6 +49,7 @@ export class BodyFactory {
     public fire({ x, y }, { x: w, y: h }): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'fire')
         sprite.setScale(w / sprite.width, h / sprite.height)
+        sprite.play({ key: 'fire', repeat: -1, startFrame: (Math.random() * 5) | 0, frameRate: 8 })
 
         this.physics.add.overlap(sprite, this.peopleGroup, (fire, person) =>
             this.burnCallback(fire as Sprite, person as Sprite),

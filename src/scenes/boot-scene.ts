@@ -81,5 +81,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image('wall', 'assets/sprites/wall.png')
         this.load.image('fire', 'assets/sprites/fire.png')
         this.load.image('exit', 'assets/sprites/exit.png')
+        this.load.spritesheet('man_animaited', 'assets/sprites/character_anim.png', { frameWidth: 13, frameHeight: 23 })
+        this.load.spritesheet('fire_animaited', 'assets/sprites/fire_anim.png', { frameWidth: 60, frameHeight: 60 })
     }
 }

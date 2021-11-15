@@ -81,6 +81,9 @@ export class GameScene extends Phaser.Scene {
             onButtonAction({ x: e.x - rect.x, y: e.y - rect.y })
         })
 
+        this.anims.create({ key: 'run', frames: this.anims.generateFrameNumbers('man_animaited', {}), frameRate: 16 })
+        this.anims.create({ key: 'fire', frames: this.anims.generateFrameNumbers('fire_animaited', {}), frameRate: 4 })
+
         const bodyFactory = new BodyFactory(
             this,
             (fire, person) => {
