@@ -142,14 +142,13 @@ export class GameScene extends Phaser.Scene {
             })
         })
 
+        this.world = worldCreator({})
         const params = (new URL(window.location.href)).searchParams;
         const levelParamData = params.get("data");
         if (levelParamData)
             this.world = worldCreator(JSON.parse(atob(levelParamData)))
         else if(levelButtons.length > 0)
             (levelButtons[0] as HTMLElement).click();
-        else
-            this.world = worldCreator({})
     }
 
     public update(): void {
