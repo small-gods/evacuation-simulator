@@ -53,7 +53,7 @@ export class GameScene extends Phaser.Scene {
         const escapedCounter = document.querySelector('#escaped-counter') as HTMLDivElement
 
         const actionButtons = document.querySelectorAll('.action-button')
-        let onButtonAction = (p: Vector) => {}
+        let onButtonAction = (p: Vector) => { }
         actionButtons.forEach(button => {
             const type = button.getAttribute('data-object')
             if (type === 'kill-all') {
@@ -119,19 +119,21 @@ export class GameScene extends Phaser.Scene {
         })
 
         const levelButtons = document.querySelectorAll('.level-button')
-        levelButtons.forEach(button => {
+        levelButtons.forEach((button, i) => {
             const url = button.getAttribute('data-object')
             button.addEventListener('click', () => {
                 fetch(url)
-                .then(resp => {
-                    return resp.json();
-                })
-                .then(resp => {
-                    this.world.deleteAll()
-                    this.world = worldCreator(resp)
-                })
-                .catch();
+                    .then(resp => {
+                        return resp.json();
+                    })
+                    .then(resp => {
+                        this.world.deleteAll()
+                        this.world = worldCreator(resp)
+                    })
+                    .catch();
             })
+            if (i === 0)
+                (button as HTMLDivElement).click()
         })
 
         this.world = worldCreator({})
