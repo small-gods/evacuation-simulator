@@ -108,6 +108,8 @@ export class GameScene extends Phaser.Scene {
 
         const loadJsonButton = document.querySelector('#worldjson-load')
         const saveJsonButton = document.querySelector('#worldjson-save')
+        const getLinkButton = document.querySelector('#worldjson-get-link')
+        
         const worldJsonText = document.querySelector('#worldjson') as HTMLInputElement
         if (loadJsonButton) loadJsonButton.addEventListener('click', () => {
             console.log(JSON.parse(worldJsonText.value))
@@ -117,8 +119,14 @@ export class GameScene extends Phaser.Scene {
         if (saveJsonButton) saveJsonButton.addEventListener('click', () => {
             worldJsonText.value = JSON.stringify(this.world.toJson())
         })
+        if (getLinkButton) getLinkButton.addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("data", btoa(JSON.stringify(this.world.toJson())));
+            url.pathname = url.pathname.replace("designer.html", "");
+            worldJsonText.value = url.toString()
+        })
 
-        const levelButtons = document.querySelectorAll('.level-button')
+        const levelButtons = document.querySelectorAll('.level-button');
         levelButtons.forEach((button, i) => {
             const url = button.getAttribute('data-object')
             button.addEventListener('click', () => {
@@ -132,11 +140,16 @@ export class GameScene extends Phaser.Scene {
                     })
                     .catch();
             })
-            if (i === 0)
-                (button as HTMLDivElement).click()
         })
 
-        this.world = worldCreator({})
+        const params = (new URL(window.location.href)).searchParams;
+        const levelParamData = params.get("data");
+        if (levelParamData)
+            this.world = worldCreator(JSON.parse(atob(levelParamData)))
+        else if(levelButtons.length > 0)
+            (levelButtons[0] as HTMLElement).click();
+        else
+            this.world = worldCreator({})
     }
 
     public update(): void {
