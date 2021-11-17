@@ -1,6 +1,9 @@
-import { Vector } from '../simulation/utils'
+import { Direction, Vector } from '../simulation/utils'
 import { World, WorldJson } from '../simulation/world'
 import { BodyFactory } from '../simulation/body-factory'
+import protobuf = require('protobufjs');
+import { base64DecToArr, protobufFromBase64, protobufToBase64 } from '../helpers';
+
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
     active: false,
@@ -23,16 +26,16 @@ export class GameScene extends Phaser.Scene {
             this.world.addActor(p.x, p.y)
         },
         'arrow-right': (p: Vector) => {
-            this.world.addArrow(this.world.absoluteToCell(p), 'Right')
+            this.world.addArrow(this.world.absoluteToCell(p), Direction.RIGHT)
         },
         'arrow-left': (p: Vector) => {
-            this.world.addArrow(this.world.absoluteToCell(p), 'Left')
+            this.world.addArrow(this.world.absoluteToCell(p), Direction.LEFT)
         },
         'arrow-up': (p: Vector) => {
-            this.world.addArrow(this.world.absoluteToCell(p), 'Up')
+            this.world.addArrow(this.world.absoluteToCell(p), Direction.UP)
         },
         'arrow-down': (p: Vector) => {
-            this.world.addArrow(this.world.absoluteToCell(p), 'Down')
+            this.world.addArrow(this.world.absoluteToCell(p), Direction.DOWN)
         },
         exit: (p: Vector) => {
             this.world.addExit(this.world.absoluteToCell(p))
@@ -109,7 +112,7 @@ export class GameScene extends Phaser.Scene {
         const loadJsonButton = document.querySelector('#worldjson-load')
         const saveJsonButton = document.querySelector('#worldjson-save')
         const getLinkButton = document.querySelector('#worldjson-get-link')
-        
+
         const worldJsonText = document.querySelector('#worldjson') as HTMLInputElement
         if (loadJsonButton) loadJsonButton.addEventListener('click', () => {
             console.log(JSON.parse(worldJsonText.value))
@@ -121,9 +124,17 @@ export class GameScene extends Phaser.Scene {
         })
         if (getLinkButton) getLinkButton.addEventListener('click', () => {
             const url = new URL(window.location.href);
-            url.searchParams.set("data", btoa(JSON.stringify(this.world.toJson())));
-            url.pathname = url.pathname.replace("designer.html", "");
-            worldJsonText.value = url.toString()
+            const worldJson = this.world.toJson();
+            protobufToBase64(
+                "assets/proto/world.proto",
+                "world.World",
+                worldJson,
+                str => {
+                    url.searchParams.forEach((v, k) => url.searchParams.delete(k));
+                    url.searchParams.set("buf", str);
+                    url.pathname = url.pathname.replace("designer.html", "");
+                    worldJsonText.value = url.toString()
+                });
         })
 
         const levelButtons = document.querySelectorAll('.level-button');
@@ -145,9 +156,20 @@ export class GameScene extends Phaser.Scene {
         this.world = worldCreator({})
         const params = (new URL(window.location.href)).searchParams;
         const levelParamData = params.get("data");
+        const levelParamBuf = params.get("buf");
+
         if (levelParamData)
             this.world = worldCreator(JSON.parse(atob(levelParamData)))
-        else if(levelButtons.length > 0)
+        else if (levelParamBuf) {
+            protobufFromBase64(
+                "assets/proto/world.proto",
+                "world.World",
+                levelParamBuf, object => {
+                    this.world = worldCreator(object);
+                }
+            );
+        }
+        else if (levelButtons.length > 0)
             (levelButtons[0] as HTMLElement).click();
     }
 

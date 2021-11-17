@@ -1,15 +1,22 @@
-export type Direction = 'Up' | 'Down' | 'Left' | 'Right'
+import { Dir } from "fs"
+
+export enum Direction {
+    UP = 0,
+    DOWN = 1,
+    LEFT = 2,
+    RIGHT = 3,
+}
 
 export type Vector = { x: number; y: number; type?: 'Vector' }
 
 export type Cell = { x: number; y: number; type?: 'Cell' }
 
 export function directionVector(direction: Direction): Vector {
-    return direction === 'Up'
+    return direction === Direction.UP
         ? { x: 0, y: -1 }
-        : direction === 'Down'
+        : direction === Direction.DOWN
         ? { x: 0, y: 1 }
-        : direction === 'Left'
+        : direction === Direction.LEFT
         ? { x: -1, y: 0 }
         : { x: 1, y: 0 }
 }
@@ -42,7 +49,7 @@ export function randomElement<T>(array: T[]): T {
     return array[randomInteger(0, array.length)]
 }
 
-const directions = ['Up' as Direction, 'Down' as Direction, 'Left' as Direction, 'Right' as Direction]
+const directions = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
 export function randomDirection(): Direction {
     return randomElement(directions)

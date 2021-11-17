@@ -42,10 +42,10 @@ export class Fire extends GameObject {
         const possibleDirections: Direction[] = []
 
         const fireCell = this.cell
-        if (!world.hasWallLoc(fireCell, 'Top')) possibleDirections.push('Up')
-        if (!world.hasWallLoc({ ...fireCell, y: fireCell.y + 1 }, 'Top')) possibleDirections.push('Down')
-        if (!world.hasWallLoc(fireCell, 'Left')) possibleDirections.push('Left')
-        if (!world.hasWallLoc({ ...fireCell, x: fireCell.x + 1 }, 'Left')) possibleDirections.push('Right')
+        if (!world.hasWallLoc(fireCell, 'Top')) possibleDirections.push(Direction.UP)
+        if (!world.hasWallLoc({ ...fireCell, y: fireCell.y + 1 }, 'Top')) possibleDirections.push(Direction.DOWN)
+        if (!world.hasWallLoc(fireCell, 'Left')) possibleDirections.push(Direction.LEFT)
+        if (!world.hasWallLoc({ ...fireCell, x: fireCell.x + 1 }, 'Left')) possibleDirections.push(Direction.RIGHT)
 
         if (possibleDirections.length === 0) return
 

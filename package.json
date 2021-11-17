@@ -16,7 +16,8 @@
         "format": "eslint src --fix"
     },
     "dependencies": {
-        "phaser": "^3.50.0"
+        "phaser": "^3.50.0",
+        "protobufjs": "^6.11.2"
     },
     "devDependencies": {
         "@types/copy-webpack-plugin": "^6.0.0",

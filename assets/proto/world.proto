@@ -1,0 +1,33 @@
+package world;
+syntax = "proto3";
+
+message World {
+    message Vector {
+        float x = 1;
+        float y = 2;
+    }
+
+    message Cell {
+        int32 x = 1;
+        int32 y = 2;
+    }
+
+    enum Direction {
+        UP = 0;
+        DOWN = 1;
+        LEFT = 2;
+        RIGHT = 3;
+    }
+
+    message Arrow {
+        Vector vec = 1;
+        Direction dir = 2;
+    }
+
+    repeated Vector actors = 1;
+    repeated Arrow arrows = 2;
+    repeated Cell fires = 3;
+    repeated Cell exits = 4;
+    repeated Cell wallTops = 5;
+    repeated Cell wallLefts = 6;
+}

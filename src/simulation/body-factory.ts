@@ -27,7 +27,7 @@ export class BodyFactory {
     }
 
     public arrow(coords: Vector, direction: Direction): Phaser.Physics.Arcade.Sprite {
-        return this.physics.add.sprite(coords.x, coords.y, 'arrow-' + direction.toLowerCase())
+        return this.physics.add.sprite(coords.x, coords.y, 'arrow-' + Direction[direction].toLowerCase())
     }
     public actor(x: number, y: number, r: number): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'man')
