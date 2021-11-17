@@ -5,7 +5,7 @@ import { Arrow, Fire, GameObject, Wall, WallLocation } from './objects'
 import { Person } from './person'
 import { Direction, randomRange, Vector, collide, Cell } from './utils'
 
-const cellSize = 50
+export const cellSize = 50
 
 export type WorldJson = {
     actors?: Vector[]
@@ -17,6 +17,9 @@ export type WorldJson = {
 }
 
 export class World {
+    public get potentialActorsCount(): number {
+        return this.worldJson.actors?.length || 0
+    }
     public actors: Person[] = []
     public arrows: Arrow[] = []
     public fires: Fire[] = []
@@ -29,7 +32,12 @@ export class World {
     private worldJson: WorldJson;
     public runningSimulation = false;
 
-    public constructor(bounds: Vector, bodyFactory: BodyFactory, json: WorldJson) {
+    public constructor(
+        bounds: Vector,
+        bodyFactory: BodyFactory,
+        json: WorldJson,
+        private readonly onUpdate: (state: World) => void,
+    ) {
         this.bounds = bounds
         this.bodyFactory = bodyFactory
         this.worldJson = json
@@ -94,6 +102,7 @@ export class World {
             this.deleteWall(coordinates)
         }
         this.arrows = filterGameObjects(cell, this.arrows)
+        this.onUpdate(this)
     }
 
     public deleteAll() {
@@ -109,6 +118,7 @@ export class World {
         this.wallLefts = []
         for (const actor of this.wallTops) actor.sprite.destroy()
         this.wallTops = []
+        this.onUpdate(this)
     }
 
     // ** Actors **
@@ -127,6 +137,7 @@ export class World {
         const sprite = this.bodyFactory.actor(x, y, 0)
         const person = new Person(sprite)
         this.actors.push(person)
+        this.onUpdate(this)
     }
 
     public killAll() {
@@ -134,6 +145,7 @@ export class World {
         this.fires.forEach(actor => actor.sprite.destroy())
         this.actors = []
         this.fires = []
+        this.onUpdate(this)
     }
 
     public deletePersonBySprite(sprite: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
@@ -142,6 +154,7 @@ export class World {
             p.sprite.destroy()
             return false
         })
+        this.onUpdate(this)
     }
 
     // ** Walls **
@@ -220,11 +233,16 @@ export class World {
     // ** Arrow **
 
     public addArrow(cell: Cell, direction: Direction) {
-        if (this.arrows.some(v => v.x === cell.x && v.y === cell.y)) return
-
+        const oldArrowIndex = this.arrows.findIndex(v => v.x === cell.x && v.y === cell.y)
         const sprite = this.bodyFactory.arrow({ x: cell.x * cellSize, y: cell.y * cellSize }, direction)
         const arrow = new Arrow(cell, direction, sprite)
-        this.arrows.push(arrow)
+        if (oldArrowIndex != -1) {
+            this.arrows[oldArrowIndex].sprite.destroy()
+            this.arrows[oldArrowIndex] = arrow
+        } else {
+            this.arrows.push(arrow)
+            this.onUpdate(this)
+        }
     }
 
     // ** Fire **
