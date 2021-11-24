@@ -134,7 +134,7 @@ export class World {
     }
 
     public addActor(x: number, y: number) {
-        const sprite = this.bodyFactory.actor(x, y, 0)
+        const sprite = this.bodyFactory.actor(Math.floor(x), Math.floor(y), 0)
         const person = new Person(sprite)
         this.actors.push(person)
         this.onUpdate(this)

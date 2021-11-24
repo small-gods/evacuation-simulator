@@ -31,3 +31,7 @@ message World {
     repeated Cell wallTops = 5;
     repeated Cell wallLefts = 6;
 }
+
+message Blob {
+    repeated int32 data = 1 [packed=true];
+}

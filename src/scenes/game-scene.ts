@@ -2,6 +2,7 @@ import { Direction, Vector } from '../simulation/utils'
 import { cellSize, World, WorldJson } from '../simulation/world'
 import { BodyFactory } from '../simulation/body-factory'
 import { base64DecToArr, protobufFromBase64, protobufToBase64 } from '../helpers'
+import { WorldJsonFromIntArray, WorldJsonToIntArray } from '../simulation/world-serializer'
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
     active: false,
@@ -153,9 +154,10 @@ export class GameScene extends Phaser.Scene {
             getLinkButton.addEventListener('click', () => {
                 const url = new URL(window.location.href)
                 const worldJson = this.world.toJson()
-                protobufToBase64('assets/proto/world.proto', 'world.World', worldJson, str => {
+                const intArr = WorldJsonToIntArray(worldJson)
+                protobufToBase64('assets/proto/world.proto', 'world.Blob', {data: intArr}, str => {
                     url.searchParams.forEach((v, k) => url.searchParams.delete(k))
-                    url.searchParams.set('buf', str)
+                    url.searchParams.set('bin', str)
                     url.pathname = url.pathname.replace('designer.html', '')
                     worldJsonText.value = url.toString()
                 })
@@ -181,11 +183,16 @@ export class GameScene extends Phaser.Scene {
         const params = new URL(window.location.href).searchParams
         const levelParamData = params.get('data')
         const levelParamBuf = params.get('buf')
+        const levelParamBin = params.get('bin')
 
         if (levelParamData) this.world = worldCreator(JSON.parse(atob(levelParamData)))
         else if (levelParamBuf) {
             protobufFromBase64('assets/proto/world.proto', 'world.World', levelParamBuf, object => {
                 this.world = worldCreator(object)
+            })
+        } else if (levelParamBin) {
+            protobufFromBase64('assets/proto/world.proto', 'world.Blob', levelParamBin, object => {
+                this.world = worldCreator(WorldJsonFromIntArray(object.data))
             })
         } else if (levelButtons.length > 0) (levelButtons[0] as HTMLElement).click()
     }
