@@ -25,7 +25,7 @@ export default <webpack.ConfigurationFactory>((rawEnv) => {
       app: './src/main.ts',
       vendors: ['phaser'],
     },
-
+    devtool: 'source-map',
     module: {
       rules: [
         {

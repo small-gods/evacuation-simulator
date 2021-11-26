@@ -2,7 +2,12 @@ import { Direction, Vector } from '../simulation/utils'
 import { cellSize, World, WorldJson } from '../simulation/world'
 import { BodyFactory } from '../simulation/body-factory'
 import { base64DecToArr, protobufFromBase64, protobufToBase64 } from '../helpers'
-import { WorldJsonFromIntArray, WorldJsonToIntArray } from '../simulation/world-serializer'
+import {
+    WorldJsonFromIntArray,
+    WorldJsonToIntArray,
+    WorldJsonFromBitsIntArray,
+    WorldJsonToBitsIntArray,
+} from '../simulation/world-serializer'
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
     active: false,
@@ -67,7 +72,18 @@ export class GameScene extends Phaser.Scene {
 
         const gridCenter = (cellSize * 15) / 2
         const gridSize = cellSize * 16
-        const debugGrid = this.add.grid(gridCenter, gridCenter, gridSize, gridSize, cellSize, cellSize, null, null, 0xFF00FF, 0.1)
+        const debugGrid = this.add.grid(
+            gridCenter,
+            gridCenter,
+            gridSize,
+            gridSize,
+            cellSize,
+            cellSize,
+            null,
+            null,
+            0xff00ff,
+            0.1,
+        )
 
         const actionButtons = document.querySelectorAll('.action-button')
         let onButtonAction = (p: Vector) => {}
@@ -154,12 +170,14 @@ export class GameScene extends Phaser.Scene {
             getLinkButton.addEventListener('click', () => {
                 const url = new URL(window.location.href)
                 const worldJson = this.world.toJson()
-                const intArr = WorldJsonToIntArray(worldJson)
-                protobufToBase64('assets/proto/world.proto', 'world.Blob', {data: intArr}, str => {
+                const intArr = WorldJsonToBitsIntArray(worldJson)
+                protobufToBase64('assets/proto/world.proto', 'world.Blob', { data: intArr }, str => {
                     url.searchParams.forEach((v, k) => url.searchParams.delete(k))
-                    url.searchParams.set('bin', str)
+                    url.searchParams.set('bit', str)
                     url.pathname = url.pathname.replace('designer.html', '')
                     worldJsonText.value = url.toString()
+                    worldJsonText.focus()
+                    worldJsonText.setSelectionRange(0, worldJsonText.value.length)
                 })
             })
 
@@ -184,6 +202,7 @@ export class GameScene extends Phaser.Scene {
         const levelParamData = params.get('data')
         const levelParamBuf = params.get('buf')
         const levelParamBin = params.get('bin')
+        const levelParamBinBit = params.get('bit')
 
         if (levelParamData) this.world = worldCreator(JSON.parse(atob(levelParamData)))
         else if (levelParamBuf) {
@@ -193,6 +212,10 @@ export class GameScene extends Phaser.Scene {
         } else if (levelParamBin) {
             protobufFromBase64('assets/proto/world.proto', 'world.Blob', levelParamBin, object => {
                 this.world = worldCreator(WorldJsonFromIntArray(object.data))
+            })
+        } else if (levelParamBinBit) {
+            protobufFromBase64('assets/proto/world.proto', 'world.Blob', levelParamBinBit, object => {
+                this.world = worldCreator(WorldJsonFromBitsIntArray(object.data))
             })
         } else if (levelButtons.length > 0) (levelButtons[0] as HTMLElement).click()
     }
