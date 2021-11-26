@@ -99,13 +99,19 @@ body {
     background-color: #cccccc;
 }
 
+.designer-tools {
+    margin: 10px;
+}
+
 .designer-button {
     background-color: #f5f5f5;
     border: 1px solid black;
     border-radius: 5px;
     padding: 3px 10px 3px 10px;
+    margin-bottom: 4px;
     cursor: pointer;
-    margin: 10px;
+    transition-property: background-color;
+    transition-duration: 0.5s;
 }
 
 .designer-button:hover {
@@ -114,6 +120,14 @@ body {
 
 .designer-button:active {
     background-color: #cccccc;
+}
+
+.designer-button_success, .designer-button_success:hover {
+    background-color: greenyellow;
+}
+
+.designer-button_failed, .designer-button_failed:hover {
+    background-color: red;
 }
 
 .action-button__image {

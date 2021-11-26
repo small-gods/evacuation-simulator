@@ -1,7 +1,7 @@
 import { Direction, Vector } from '../simulation/utils'
 import { cellSize, World, WorldJson } from '../simulation/world'
 import { BodyFactory } from '../simulation/body-factory'
-import { base64DecToArr, protobufFromBase64, protobufToBase64 } from '../helpers'
+import { base64DecToArr, protobufFromBase64, protobufToBase64, protobufToBase64Promise } from '../helpers'
 import {
     WorldJsonFromIntArray,
     WorldJsonToIntArray,
@@ -154,6 +154,9 @@ export class GameScene extends Phaser.Scene {
         const loadJsonButton = document.querySelector('#worldjson-load')
         const saveJsonButton = document.querySelector('#worldjson-save')
         const getLinkButton = document.querySelector('#worldjson-get-link')
+        const clipboardLinkButton = document.querySelector('#worldjson-copy-link')
+        const openLinkButton = document.querySelector('#worldjson-open-link')
+        const setLinkButton = document.querySelector('#worldjson-active-link')
 
         const worldJsonText = document.querySelector('#worldjson') as HTMLInputElement
         if (loadJsonButton)
@@ -168,17 +171,38 @@ export class GameScene extends Phaser.Scene {
             })
         if (getLinkButton)
             getLinkButton.addEventListener('click', () => {
-                const url = new URL(window.location.href)
-                const worldJson = this.world.toJson()
-                const intArr = WorldJsonToBitsIntArray(worldJson)
-                protobufToBase64('assets/proto/world.proto', 'world.Blob', { data: intArr }, str => {
-                    url.searchParams.forEach((v, k) => url.searchParams.delete(k))
-                    url.searchParams.set('bit', str)
-                    url.pathname = url.pathname.replace('designer.html', '')
-                    worldJsonText.value = url.toString()
+                this.getLevelUrl().then(url => {
+                    worldJsonText.value = url
                     worldJsonText.focus()
                     worldJsonText.setSelectionRange(0, worldJsonText.value.length)
                 })
+            })
+        if (clipboardLinkButton)
+            clipboardLinkButton.addEventListener('click', () => {
+                this.getLevelUrl()
+                    .then(url => navigator.clipboard.writeText(url))
+                    .then(() => {
+                        clipboardLinkButton.classList.toggle('designer-button_success', true)
+                        setTimeout(() => clipboardLinkButton.classList.toggle('designer-button_success', false), 1000)
+                    })
+                    .catch(err => {
+                        console.error(err)
+                        clipboardLinkButton.classList.toggle('designer-button_failed', true)
+                        setTimeout(() => clipboardLinkButton.classList.toggle('designer-button_failed', false), 1000)
+                    })
+            })
+        if (openLinkButton)
+            openLinkButton.addEventListener('click', () => {
+                this.getLevelUrl().then(url => {
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.target = '_blank'
+                    a.click()
+                })
+            })
+        if (setLinkButton)
+            setLinkButton.addEventListener('click', () => {
+                this.getLevelUrl('designer').then(url => window.history.pushState(undefined, '', url))
             })
 
         const levelButtons = document.querySelectorAll('.level-button')
@@ -193,7 +217,6 @@ export class GameScene extends Phaser.Scene {
                         this.world.deleteAll()
                         this.world = worldCreator(resp)
                     })
-                    .catch()
             })
         })
 
@@ -220,9 +243,25 @@ export class GameScene extends Phaser.Scene {
         } else if (levelButtons.length > 0) (levelButtons[0] as HTMLElement).click()
     }
 
+    private getLevelUrl(mode: 'designer' | 'game' = 'game') {
+        const worldJson = this.world.toJson()
+        const intArr = WorldJsonToBitsIntArray(worldJson)
+        return protobufToBase64Promise('assets/proto/world.proto', 'world.Blob', { data: intArr }).then(lvl =>
+            toLevelUrl(mode, 'bit', lvl),
+        )
+    }
+
     public update(): void {
         this.world.tick()
     }
+}
+
+function toLevelUrl(mode: 'designer' | 'game', paramName: string, lvl: string): string {
+    const url = new URL(window.location.href)
+    url.searchParams.forEach((v, k) => url.searchParams.delete(k))
+    url.searchParams.set(paramName, lvl)
+    if (mode === 'game') url.pathname = url.pathname.replace('designer.html', '')
+    return url.toString()
 }
 
 function makeCursorFromImg(img: HTMLImageElement, width = 32, height = width) {

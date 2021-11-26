@@ -1,3 +1,4 @@
+import { resolve } from 'path/posix';
 import * as Phaser from 'phaser'
 import protobuf = require('protobufjs');
 import { encode } from 'querystring';
@@ -28,6 +29,16 @@ export function protobufToBase64(
     });
 }
 
+export function protobufToBase64Promise(
+    filename: string | string[],
+    type: string | string[],
+    message: { [k: string]: unknown },
+): Promise<string> {
+    return new Promise(resolve => {
+        protobufToBase64(filename, type, message, resolve)
+    })
+}
+
 export function protobufFromBase64(
     filename: (string | string[]),
     type: (string | string[]),
@@ -38,7 +49,7 @@ export function protobufFromBase64(
         const MessageType = root.lookupType(type);
         const buffer = base64DecToArr(message);
         const source = MessageType.decode(buffer);
-        var object = MessageType.toObject(source, { });
+        var object = MessageType.toObject(source, {});
         callback(object);
     });
 }
@@ -49,38 +60,40 @@ export const isDesigner = document.URL.includes("designer");
 function b64ToUint6(nChr: number): number {
     return nChr > 64 && nChr < 91 ? nChr - 65
         : nChr > 96 && nChr < 123 ? nChr - 71
-        : nChr > 47 && nChr < 58 ? nChr + 4
-        : nChr === 43 ? 62
-        : nChr === 47 ? 63 : 0;
+            : nChr > 47 && nChr < 58 ? nChr + 4
+                : nChr === 43 ? 62
+                    : nChr === 47 ? 63 : 0;
 }
 
 
 function uint6ToB64(nUint6: number): number {
     return nUint6 < 26 ? nUint6 + 65
         : nUint6 < 52 ? nUint6 + 71
-        : nUint6 < 62 ? nUint6 - 4
-        : nUint6 === 62 ? 43
-        : nUint6 === 63 ? 47 : 65;
+            : nUint6 < 62 ? nUint6 - 4
+                : nUint6 === 62 ? 43
+                    : nUint6 === 63 ? 47 : 65;
 }
 
 
 export function base64DecToArr(sBase64: string, nBlocksSize?: number): Uint8Array {
-        const sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, "");
-        const nInLen = sB64Enc.length;
-        const nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2;
-        let taBytes = new Uint8Array(nOutLen);
+    const sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, "");
+    const nInLen = sB64Enc.length;
+    const nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2;
+    let taBytes = new Uint8Array(nOutLen);
 
     for (let nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
         nMod4 = nInIdx & 3;
         nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 6 * (3 - nMod4);
         if (nMod4 === 3 || nInLen - nInIdx === 1) {
-        for (nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
-            taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
-        }
-        nUint24 = 0;
+            for (nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+                taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
+            }
+            nUint24 = 0;
 
         }
     }
+
+    console.log(taBytes.reduce((hist, x) => (hist[x]++, hist), new Array(256).fill(0)).map((count, i) => ([i, count])).sort(([, a], [, b]) => b - a).map(([i, count]) => `${i}: ${count}`))
 
     return taBytes;
 }
@@ -93,7 +106,7 @@ export function base64EncArr(aBytes: Uint8Array): string {
     for (let nLen = aBytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         nMod3 = nIdx % 3;
         if (nIdx > 0 && (nIdx * 4 / 3) % 76 === 0) { sB64Enc += "\r\n"; }
-            nUint24 |= aBytes[nIdx] << (16 >>> nMod3 & 24);
+        nUint24 |= aBytes[nIdx] << (16 >>> nMod3 & 24);
         if (nMod3 === 2 || aBytes.length - nIdx === 1) {
             sB64Enc += String.fromCharCode(uint6ToB64(nUint24 >>> 18 & 63), uint6ToB64(nUint24 >>> 12 & 63), uint6ToB64(nUint24 >>> 6 & 63), uint6ToB64(nUint24 & 63));
             nUint24 = 0;
