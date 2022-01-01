@@ -83,5 +83,10 @@ export class BootScene extends Phaser.Scene {
         this.load.image('exit', 'assets/sprites/exit.png')
         this.load.spritesheet('man_animaited', 'assets/sprites/character_anim.png', { frameWidth: 13, frameHeight: 23 })
         this.load.spritesheet('fire_animaited', 'assets/sprites/fire_anim.png', { frameWidth: 60, frameHeight: 60 })
+
+        const soundPath = name => `assets/sounds/${name}`
+        this.load.audio('fire-new', ['new_fire.ogg', 'new_fire.mp3'].map(soundPath))
+        this.load.audioSprite('exit', soundPath('exit.json'), ['exit.ogg'].map(soundPath))
+        this.load.audioSprite('die', soundPath('die.json'), ['die.ogg'].map(soundPath))
     }
 }

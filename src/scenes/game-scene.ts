@@ -58,8 +58,22 @@ export class GameScene extends Phaser.Scene {
     }
 
     public create(): void {
+        this.sound.add('fire-new')
         const $counters = document.querySelector('.counters') as HTMLDivElement
         const countersTypes = ['actors', 'burned', 'escaped', 'arrows'] as const
+        const soundVolume = document.createElement('input')
+        soundVolume.title = 'sound'
+        soundVolume.type = 'range'
+        soundVolume.min = '0'
+        soundVolume.max = '100'
+        soundVolume.value = '50'
+        soundVolume.addEventListener('input', () => {
+            this.sound.volume = parseFloat(soundVolume.value) / 50
+        })
+        const soundLable = document.createElement('label')
+        soundLable.textContent = 'Sound: '
+        soundLable.appendChild(soundVolume)
+        document.body.append(soundLable)
         const counters = Object.fromEntries(
             countersTypes.map(counter => {
                 const dom = document.createElement('div')
@@ -86,6 +100,7 @@ export class GameScene extends Phaser.Scene {
         )
 
         const actionButtons = document.querySelectorAll('.action-button')
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         let onButtonAction = (p: Vector) => {}
         let lastCursor = ''
         actionButtons.forEach(button => {
@@ -134,11 +149,13 @@ export class GameScene extends Phaser.Scene {
         const bodyFactory = new BodyFactory(
             this,
             (fire, person) => {
+                this.sound.playAudioSprite('die', Phaser.Math.RND.between(0, 7).toString(), { volume: 0.5 })
                 this.world.deletePersonBySprite(person)
                 this.burned += 1
                 counters.burned.textContent = this.burned + ''
             },
             person => {
+                this.sound.playAudioSprite('exit', Phaser.Math.RND.between(0, 3).toString(), { volume: 0.4 })
                 this.world.deletePersonBySprite(person)
                 this.escaped += 1
                 counters.escaped.textContent = this.escaped + ''

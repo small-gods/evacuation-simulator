@@ -1,0 +1,27 @@
+{
+    "resources": [
+        "assets/sounds/exit.ogg"
+    ],
+    "spritemap": {
+        "0": {
+            "start": 0,
+            "end": 0.84,
+            "loop": false
+        },
+        "1": {
+            "start": 1.068,
+            "end": 1.765,
+            "loop": false
+        },
+        "2": {
+            "start": 1.892,
+            "end": 2.728,
+            "loop": false
+        },
+        "3": {
+            "start": 2.914,
+            "end": 3.518,
+            "loop": false
+        }
+    }
+}

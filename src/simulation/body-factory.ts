@@ -48,19 +48,31 @@ export class BodyFactory {
     }
     public fire({ x, y }, { x: w, y: h }): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'fire')
-        sprite.setScale(w / sprite.width, h / sprite.height)
+        sprite.setScale(0)
         sprite.play({ key: 'fire', repeat: -1, startFrame: (Math.random() * 5) | 0, frameRate: 8 })
-
-        this.physics.add.overlap(sprite, this.peopleGroup, (fire, person) =>
-            this.burnCallback(fire as Sprite, person as Sprite),
-        )
+        this.physics.scene.sound.play('fire-new', { volume: Phaser.Math.RND.realInRange(0.1, 0.2) })
+        this.physics.scene.tweens.timeline({
+            targets: sprite,
+            duration: Phaser.Math.RND.between(400, 1000),
+            tweens: [
+                {
+                    scaleX: w / sprite.width,
+                    scaleY: h / sprite.height,
+                },
+            ],
+        })
+        this.physics.add.overlap(sprite, this.peopleGroup, (fire, person) => {
+            this.burnCallback(fire as Sprite, person as Sprite)
+        })
         return sprite
     }
     public exit({ x, y }, { x: w, y: h }): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'exit')
         sprite.setScale(w / sprite.width, h / sprite.height)
 
-        this.physics.add.overlap(sprite, this.peopleGroup, (escape, person) => this.escapeCallback(person as Sprite))
+        this.physics.add.overlap(sprite, this.peopleGroup, (escape, person) => {
+            this.escapeCallback(person as Sprite)
+        })
         return sprite
     }
 }

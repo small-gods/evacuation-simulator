@@ -29,8 +29,8 @@ export class World {
 
     private bodyFactory: BodyFactory
     private bounds: Vector
-    private worldJson: WorldJson;
-    public runningSimulation = false;
+    private worldJson: WorldJson
+    public runningSimulation = false
 
     public constructor(
         bounds: Vector,
@@ -45,38 +45,40 @@ export class World {
     }
 
     private reloadWorld(spawnActors: boolean, spawnWorld) {
-        const json = this.worldJson;
+        const json = this.worldJson
         if (json.actors && spawnActors) for (const actor of json.actors) this.addActor(actor.x, actor.y)
         if (json.fires && spawnActors) for (const actor of json.fires) this.addFire({ x: actor.x, y: actor.y })
         if (json.arrows && spawnWorld) for (const actor of json.arrows) this.addArrow(actor.vec, actor.dir)
         if (json.exits && spawnWorld) for (const actor of json.exits) this.addExit({ x: actor.x, y: actor.y })
-        if (json.wallLefts && spawnWorld) for (const actor of json.wallLefts) this.addWallLoc({ x: actor.x, y: actor.y }, 'Left')
-        if (json.wallTops && spawnWorld) for (const actor of json.wallTops) this.addWallLoc({ x: actor.x, y: actor.y }, 'Top')
+        if (json.wallLefts && spawnWorld)
+            for (const actor of json.wallLefts) this.addWallLoc({ x: actor.x, y: actor.y }, 'Left')
+        if (json.wallTops && spawnWorld)
+            for (const actor of json.wallTops) this.addWallLoc({ x: actor.x, y: actor.y }, 'Top')
     }
 
     public runSimulation() {
-        if (this.runningSimulation) return;
+        if (this.runningSimulation) return
         if (isDesigner) {
-            this.worldJson = this.toJson();
+            this.worldJson = this.toJson()
         } else {
-            this.reloadWorld(true, false);
+            this.reloadWorld(true, false)
         }
-        this.runningSimulation = true;
+        this.runningSimulation = true
     }
 
     public stopSimulation() {
-        if (!this.runningSimulation) return;
+        if (!this.runningSimulation) return
         if (isDesigner) {
-            this.deleteAll();
-            this.reloadWorld(true, true);
+            this.deleteAll()
+            this.reloadWorld(true, true)
         } else {
             this.killAll()
         }
-        this.runningSimulation = false;
+        this.runningSimulation = false
     }
 
     public isRunning(): boolean {
-        return this.runningSimulation;
+        return this.runningSimulation
     }
 
     public toJson(): WorldJson {
@@ -106,7 +108,7 @@ export class World {
     }
 
     public deleteAll() {
-        for (const actor of this.actors) actor.sprite.destroy()
+        for (const actor of this.actors) actor.destroy()
         this.actors = []
         for (const actor of this.arrows) actor.sprite.destroy()
         this.arrows = []
@@ -141,7 +143,7 @@ export class World {
     }
 
     public killAll() {
-        this.actors.forEach(actor => actor.sprite.destroy())
+        this.actors.forEach(actor => actor.destroy())
         this.fires.forEach(actor => actor.sprite.destroy())
         this.actors = []
         this.fires = []
@@ -151,7 +153,17 @@ export class World {
     public deletePersonBySprite(sprite: Phaser.Types.Physics.Arcade.GameObjectWithBody) {
         this.actors = this.actors.filter(p => {
             if (p.sprite != sprite) return true
-            p.sprite.destroy()
+            p.sprite.body.checkCollision.none = true
+            p.sprite.scene.tweens.timeline({
+                targets: p.sprite,
+                duration: 500,
+                tweens: [
+                    {
+                        scale: 0,
+                    },
+                ],
+                onComplete: () => p.destroy(),
+            })
             return false
         })
         this.onUpdate(this)
@@ -267,7 +279,7 @@ export class World {
     }
 
     public tick() {
-        if (!this.isRunning()) return;
+        if (!this.isRunning()) return
         for (const fire of this.fires) {
             fire.tick(this)
         }
