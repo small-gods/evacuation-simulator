@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Evacuation game prorotype designer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta http-equiv="cleartype" content="on">
+
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+</head>
+
+<body class="designer-mode">
+    <div class="counters">
+    </div>
+    <section class="main">
+    <div class="action-buttons">
+        <div class="action-button" title="Play"         data-object="kill-all"><img class="action-button__image" src="./assets/sprites/kill-all.png" /></div><br>
+        <div class="action-button" title="Stop"         data-object="spawn-all"><img class="action-button__image" src="./assets/sprites/spawn-all.png" /></div><br>
+        <div class="action-button" title="Homuncule"    data-object="actor"><img class="action-button__image" src="./assets/sprites/character.png" /></div><br>
+        <div class="action-button" title="Right arrow"  data-object="arrow-right"><img class="action-button__image" src="./assets/sprites/arrow-right.png" /></div><br>
+        <div class="action-button" title="Left arrow"   data-object="arrow-left"><img class="action-button__image" src="./assets/sprites/arrow-left.png" /></div><br>
+        <div class="action-button" title="Up arrow"     data-object="arrow-up"><img class="action-button__image" src="./assets/sprites/arrow-up.png" /></div><br>
+        <div class="action-button" title="Down arrow"   data-object="arrow-down"><img class="action-button__image" src="./assets/sprites/arrow-down.png" /></div><br>
+        <div class="action-button" title="Exit"         data-object="exit"><img class="action-button__image" src="./assets/sprites/exit.png" /></div><br>
+        <div class="action-button" title="Wall"         data-object="wall"><img class="action-button__image" src="./assets/sprites/wall.png" /></div><br>
+        <div class="action-button" title="Fire"         data-object="fire"><img class="action-button__image" src="./assets/sprites/fire.png" /></div><br>
+        <div class="action-button" title="Delete"       data-object="delete"><img class="action-button__image" src="./assets/sprites/delete.png" /></div><br>
+    </div>
+    <div id="content" class="content-container"></div>
+
+    <div class="designer-tools">
+        <div class="designer-button" id="worldjson-copy-link">Copy link to clipboard</div>
+        <div class="designer-button" id="worldjson-open-link">Open lvl in new tab</div>
+        <div class="designer-button" id="worldjson-active-link">Set to current url</div>
+        <textarea id="worldjson" rows="20" cols=20>{}</textarea>
+        <div class="designer-button" id="worldjson-get-link">Get link to textarea</div>
+        <div class="designer-button" id="worldjson-save">Save to JSON</div>
+        <div class="designer-button" id="worldjson-load">Load from JSON</div>
+    </div>
+    </section>
+    <script src="vendors.app.bundle.js"></script>
+    <script src="app.bundle.js"></script>
+</body>
+
+</html>

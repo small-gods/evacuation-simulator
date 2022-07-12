@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Evacuation game prorotype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta http-equiv="cleartype" content="on">
+
+    <link rel="stylesheet" type="text/css" href="style/style.css">
+</head>
+
+<body>
+    <div class="counters">
+    </div>
+    <section class="main">
+    <div class="action-buttons">
+        <div class="action-button" title="Play" data-object="spawn-all"><img class="action-button__image" src="./assets/sprites/spawn-all.png" /></div><br>
+        <div class="action-button" title="Stop" data-object="kill-all"><img class="action-button__image" src="./assets/sprites/kill-all.png" /></div><br>
+        <div class="action-button" title="Right arrow" data-object="arrow-right"><img class="action-button__image" src="./assets/sprites/arrow-right.png" /></div><br>
+        <div class="action-button" title="Left arrow" data-object="arrow-left"><img class="action-button__image" src="./assets/sprites/arrow-left.png" /></div><br>
+        <div class="action-button" title="Up arrow" data-object="arrow-up"><img class="action-button__image" src="./assets/sprites/arrow-up.png" /></div><br>
+        <div class="action-button" title="Down arrow" data-object="arrow-down"><img class="action-button__image" src="./assets/sprites/arrow-down.png" /></div><br>
+        <div class="action-button" title="Delete" data-object="delete"><img class="action-button__image" src="./assets/sprites/delete.png" /></div><br>
+    </div>
+    <div id="content" class="content-container"></div>
+    <div class="level-buttons">
+        <div class="level-button" data-object="./assets/levels/level1.json">Level 1</div>
+        <div class="level-button" data-object="./assets/levels/level2.json">Level 2</div>
+        <div class="level-button" data-object="./assets/levels/level3.json">Level 3</div>
+    </div>
+    </section>
+    <script src="vendors.app.bundle.js"></script>
+    <script src="app.bundle.js"></script>
+</body>
+
+</html>

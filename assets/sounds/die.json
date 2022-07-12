@@ -1,0 +1,47 @@
+{
+    "resources": [
+        "assets/sounds/die.ogg"
+    ],
+    "spritemap": {
+        "0": {
+            "start": 0,
+            "end": 0.264,
+            "loop": false
+        },
+        "1": {
+            "start": 0.328,
+            "end": 0.66,
+            "loop": false
+        },
+        "2": {
+            "start": 0.752,
+            "end": 0.91,
+            "loop": false
+        },
+        "3": {
+            "start": 1.042,
+            "end": 1.338,
+            "loop": false
+        },
+        "4": {
+            "start": 1.408,
+            "end": 1.634,
+            "loop": false
+        },
+        "5": {
+            "start": 1.727,
+            "end": 1.924,
+            "loop": false
+        },
+        "6": {
+            "start": 2.029,
+            "end": 2.226,
+            "loop": false
+        },
+        "7": {
+            "start": 2.395,
+            "end": 2.94,
+            "loop": false
+        }
+    }
+}

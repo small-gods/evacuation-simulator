@@ -1,0 +1,151 @@
+html,
+body,
+canvas {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+}
+
+.main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.counter {
+    padding: 14px;
+    font-size: large;
+    font-weight: 900;
+}
+
+.burned {
+    color: red;
+}
+
+.burned::before {
+    content: "Burned: ";
+}
+
+.escaped {
+    color: green;
+}
+
+.escaped::before {
+    content: "Escaped: ";
+}
+
+.arrows {
+    color: green;
+}
+
+.arrows::before {
+    content: "Arrows: ";
+}
+
+.actors {
+    color: black;
+}
+
+.actors::before {
+    content: "In danger: ";
+}
+
+.action-buttons {
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.action-button {
+    width: 50px;
+    height: 50px;
+    background-color: #f5f5f5;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background-color: #b4b4b4;
+}
+
+.action-button:active {
+    background-color: #cccccc;
+}
+
+.level-button {
+    background-color: #f5f5f5;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 3px 10px 3px 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.level-button:hover {
+    background-color: #b4b4b4;
+}
+
+.level-button:active {
+    background-color: #cccccc;
+}
+
+.designer-tools {
+    margin: 10px;
+}
+
+.designer-button {
+    background-color: #f5f5f5;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 3px 10px 3px 10px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition-property: background-color;
+    transition-duration: 0.5s;
+}
+
+.designer-button:hover {
+    background-color: #b4b4b4;
+}
+
+.designer-button:active {
+    background-color: #cccccc;
+}
+
+.designer-button_success, .designer-button_success:hover {
+    background-color: greenyellow;
+}
+
+.designer-button_failed, .designer-button_failed:hover {
+    background-color: red;
+}
+
+.action-button__image {
+    width: 80%;
+    height: 80%;
+    margin: 10%;
+}
+
+.content-container {
+    width: 700px;
+    height: 700px;
+}
+
+.designer-mode .content-container {
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.counters {
+    display: flex;
+}
