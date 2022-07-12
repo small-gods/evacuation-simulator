@@ -58,7 +58,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     public create(): void {
-        this.sound.add('fire-new')
+        this.sound.pauseOnBlur = false
         const $counters = document.querySelector('.counters') as HTMLDivElement
         const countersTypes = ['actors', 'burned', 'escaped', 'arrows'] as const
         const soundVolume = document.createElement('input')
@@ -166,6 +166,7 @@ export class GameScene extends Phaser.Scene {
             new World({ x: 13, y: 13 }, bodyFactory, json, world => {
                 counters.arrows.innerHTML = `${world.arrows.length}/&#8734`
                 counters.actors.textContent = `${world.actors.length}/${world.potentialActorsCount}`
+                // if (world.isRunning() && world.actors.length === 0) alert('GAME OVER')
             })
 
         const loadJsonButton = document.querySelector('#worldjson-load')

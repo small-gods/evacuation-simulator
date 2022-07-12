@@ -49,7 +49,12 @@ export class BodyFactory {
     public fire({ x, y }, { x: w, y: h }): Phaser.Physics.Arcade.Sprite {
         const sprite = this.physics.add.sprite(x, y, 'fire')
         sprite.setScale(0)
-        sprite.play({ key: 'fire', repeat: -1, startFrame: (Math.random() * 5) | 0, frameRate: 8 })
+        sprite.play({
+            key: 'fire',
+            repeat: -1,
+            startFrame: Phaser.Math.RND.between(0, 4),
+            frameRate: Phaser.Math.RND.between(8, 10),
+        })
         this.physics.scene.sound.play('fire-new', { volume: Phaser.Math.RND.realInRange(0.1, 0.2) })
         this.physics.scene.tweens.timeline({
             targets: sprite,

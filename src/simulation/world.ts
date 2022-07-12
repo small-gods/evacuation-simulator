@@ -30,7 +30,7 @@ export class World {
     private bodyFactory: BodyFactory
     private bounds: Vector
     private worldJson: WorldJson
-    public runningSimulation = false
+    private runningSimulation = false
 
     public constructor(
         bounds: Vector,
@@ -68,13 +68,13 @@ export class World {
 
     public stopSimulation() {
         if (!this.runningSimulation) return
+        this.runningSimulation = false
         if (isDesigner) {
             this.deleteAll()
             this.reloadWorld(true, true)
         } else {
             this.killAll()
         }
-        this.runningSimulation = false
     }
 
     public isRunning(): boolean {
